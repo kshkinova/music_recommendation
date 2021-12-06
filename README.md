@@ -21,8 +21,8 @@ python3 process_datasets.py
 ```sh
 python3 music_pred.py
 ```
-    or 
-  run pretrained models (a lot faster)
+OR
+   run pretrained models (a lot faster)
 ```sh
 python3 pretrained.py
 ```
