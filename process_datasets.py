@@ -180,5 +180,5 @@ def get_plots(train_data, valid_data):
     print('Number of songs with <= 3 users listened to it: ', user_count.where(user_count<=3).count())   
 
 if __name__ == '__main__':
-    # main(dataset_path='./datasets/', dev=True)
-    main(dataset_path='./datasets/', dev=False)
+    main(dataset_path='./datasets/', dev=True)
+    # main(dataset_path='./datasets/', dev=False)

@@ -22,7 +22,7 @@ python3 process_datasets.py
 python3 music_pred.py
 ```
 OR
-   run pretrained models (a lot faster)
+(Fast method) run pretrained models to view scores
 ```sh
 python3 pretrained.py
 ```

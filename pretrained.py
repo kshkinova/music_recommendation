@@ -32,7 +32,6 @@ def main(dataset_path, save_path, dev):
     get_feature_importance(importance, train_data.columns, 'logreg_importance.png',)
     
     print('Accuracy on valid: ', log_reg.score(x_valid,y_valid))
-    print('Accuracy on train: ', log_reg.score(x_train,y_train))
     
     
     # SVM
@@ -43,7 +42,6 @@ def main(dataset_path, save_path, dev):
     get_feature_importance(importance, train_data.columns, 'svm_importance.png')
     
     print('Accuracy on valid: ', model.score(x_valid,y_valid))
-    print('Accuracy on train: ', model.score(x_train,y_train))
     
 
     # Decision Tree

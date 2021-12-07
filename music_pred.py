@@ -34,6 +34,7 @@ def main(dataset_path, save_path, dev):
     
     print('Starting training')
 
+
     # Logistic Regression
     log_reg = LogisticRegression(solver='lbfgs', multi_class='auto')
     print('\n---------- Running Logistic... ----------')
@@ -45,6 +46,7 @@ def main(dataset_path, save_path, dev):
     get_feature_importance(importance, train_data.columns, 'logreg_importance.png',)
     evaluate_model(log_reg,x_train,y_train,x_valid,y_valid)
     
+
     # SVM
     model = svm.LinearSVC(max_iter=1000)
     print('\n---------- Running SVM... ----------')
@@ -56,6 +58,7 @@ def main(dataset_path, save_path, dev):
     get_feature_importance(importance, train_data.columns, 'svm_importance.png')
     print('SVM score on train: ', model.score(x_train,y_train))
     print('SVM score on valid: ', model.score(x_valid,y_valid))
+
 
     # Decision Tree
     tree = DecisionTreeClassifier(criterion='gini', max_depth=10,
@@ -71,6 +74,7 @@ def main(dataset_path, save_path, dev):
     print('DecisionTree score on train: ', tree.score(x_train,y_train))
     print('DecisionTree score on valid: ', tree.score(x_valid,y_valid))
 
+
     # Random Forest
     forest = RandomForestClassifier(class_weight='balanced',criterion='gini', 
                        max_depth=25, min_samples_split=10, n_estimators=500, n_jobs=-1)
@@ -82,6 +86,7 @@ def main(dataset_path, save_path, dev):
     importance = forest.feature_importances_
     get_feature_importance(importance, train_data.columns, 'forest_importance.png')
     evaluate_model(forest,x_train,y_train,x_valid,y_valid)
+
 
     # XgBoost
 
@@ -95,6 +100,7 @@ def main(dataset_path, save_path, dev):
     importance = model.feature_importances_
     get_feature_importance(importance, train_data.columns, 'xgb_importance.png')
 
+
     # LightGBM
 
     model = lgb.LGBMModel(learning_rate = 0.3, max_depth = 15, num_leaves = 250, objective = 'binary', n_estimators=200)
@@ -102,16 +108,15 @@ def main(dataset_path, save_path, dev):
     model.fit(x_train,y_train, eval_set = [(x_valid,y_valid)], eval_metric = 'auc')
     pickle.dump(model,open(save_path + 'lgbm_model.sav', 'wb'))
 
-    # model = pickle.load(open('./predictions/lgbm_model.sav', 'rb'))
     print(np.mean((model.predict(x_valid, num_iteration=model.best_iteration_)>0.5)==y_valid))
     print(np.mean((model.predict(x_train, num_iteration=model.best_iteration_)>0.5)==y_train))
     importance = model.feature_importances_
     get_feature_importance(importance, train_data.columns, 'lgbm_importance.png')
 
     # PCA ICA KBest
-    pca = PCA(n_components=10)
-    ica = FastICA(n_components=10)
-    kbest = SelectKBest(f_classif, k=15)
+    pca = PCA(n_components=20)
+    ica = FastICA(n_components=20)
+    kbest = SelectKBest(f_classif, k=20)
 
     feature_selection(pca, x_train, y_train, x_valid, y_valid)
     feature_selection(ica, x_train, y_train, x_valid, y_valid)
@@ -135,7 +140,6 @@ def feature_selection(model, x_train, y_train, x_valid, y_valid):
 
     model.fit(x_train_new,y_train, eval_set = [(x_valid_new,y_valid)], eval_metric = 'auc')
     print(np.mean((model.predict(x_valid_new, num_iteration=model.best_iteration_)>0.5)==y_valid))
-    print(np.mean((model.predict(x_train_new, num_iteration=model.best_iteration_)>0.5)==y_train))
 
 def evaluate_model(model,x_train,y_train,x_valid,y_valid):
     print('Accuracy on train: ', model.score(x_train,y_train))
