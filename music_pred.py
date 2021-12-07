@@ -1,14 +1,15 @@
 import numpy as np
 import pandas as pd
-import pickle
 import matplotlib.pyplot as plt
-import lightgbm as lgb
-import xgboost as xgb
+import pickle
 
 from sklearn.linear_model import LogisticRegression
+from sklearn import svm
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn import svm
+import xgboost as xgb
+import lightgbm as lgb
+
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import accuracy_score
 from sklearn.decomposition import PCA, FastICA
@@ -57,12 +58,8 @@ def main(dataset_path, save_path, dev):
     print('SVM score on valid: ', model.score(x_valid,y_valid))
 
     # Decision Tree
-    tree = DecisionTreeClassifier(ccp_alpha=0.0, class_weight=None, criterion='gini',
-                       max_depth=10, max_features=None, max_leaf_nodes=84,
-                       min_impurity_decrease=0.0, min_impurity_split=None,
-                       min_samples_leaf=1, min_samples_split=5,
-                       min_weight_fraction_leaf=0.0, presort='deprecated',
-                       random_state=None, splitter='best')
+    tree = DecisionTreeClassifier(criterion='gini', max_depth=10,
+                                max_leaf_nodes=84, min_samples_split=5)
     print('\n---------- Running Decision Tree... ----------')
     tree.fit(x_train, y_train)
 
@@ -75,14 +72,8 @@ def main(dataset_path, save_path, dev):
     print('DecisionTree score on valid: ', tree.score(x_valid,y_valid))
 
     # Random Forest
-    forest = RandomForestClassifier(bootstrap=True, ccp_alpha=0.0, class_weight='balanced',
-                       criterion='gini', max_depth=25, max_features='auto',
-                       max_leaf_nodes=None, max_samples=None,
-                       min_impurity_decrease=0.0, min_impurity_split=None,
-                       min_samples_leaf=1, min_samples_split=10,
-                       min_weight_fraction_leaf=0.0, n_estimators=1000,
-                       n_jobs=-1, oob_score=False, random_state=23, verbose=0,
-                       warm_start=False)
+    forest = RandomForestClassifier(class_weight='balanced',criterion='gini', 
+                       max_depth=25, min_samples_split=10, n_estimators=500, n_jobs=-1)
     print('\n---------- Running Random Forest... ----------')
     forest.fit(x_train, y_train)
 
@@ -91,8 +82,6 @@ def main(dataset_path, save_path, dev):
     importance = forest.feature_importances_
     get_feature_importance(importance, train_data.columns, 'forest_importance.png')
     evaluate_model(forest,x_train,y_train,x_valid,y_valid)
-    print('RandomForest score on train: ', forest.score(x_train,y_train))
-    print('RandomForest score on valid: ', forest.score(x_valid,y_valid))
 
     # XgBoost
 
@@ -101,7 +90,6 @@ def main(dataset_path, save_path, dev):
     model.fit(x_train, y_train, eval_set = [(x_valid,y_valid)], eval_metric = 'auc')
     pickle.dump(model,open(save_path + 'xgb_model.sav', 'wb'))
 
-    # model = pickle.load(open('xgb_model.sav', 'rb'))
     print(accuracy_score(y_valid, model.predict(x_valid)>0.5))
     print(accuracy_score(y_train, model.predict(x_train)>0.5))
     importance = model.feature_importances_
@@ -109,7 +97,7 @@ def main(dataset_path, save_path, dev):
 
     # LightGBM
 
-    model = lgb.LGBMModel(learning_rate = 0.3, max_depth = 15, num_leaves = 250, objective = 'binary', n_estimators=200) #0.61
+    model = lgb.LGBMModel(learning_rate = 0.3, max_depth = 15, num_leaves = 250, objective = 'binary', n_estimators=200)
     print('\n---------- Running LightGBM... ----------')
     model.fit(x_train,y_train, eval_set = [(x_valid,y_valid)], eval_metric = 'auc')
     pickle.dump(model,open(save_path + 'lgbm_model.sav', 'wb'))

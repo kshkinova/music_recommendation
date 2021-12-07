@@ -161,6 +161,7 @@ def get_plots(train_data, valid_data):
     print('Tontal number of songs:', data['song_id'].nunique())
 
     # user cold-start
+    f1 = plt.figure()
     song_count = data.groupby('msno').count()['song_id'] # song count per user
     print('\nSong count per user: mean {:.2f}, max {}, min {}'.format(song_count.mean(), song_count.max(), song_count.min()))
     song_count.hist(bins=100, range=[0,1000])
@@ -169,13 +170,15 @@ def get_plots(train_data, valid_data):
     plt.savefig('./plots/user_coldstart.png')
     print('Number of users with < 10 song listening history: ', song_count.where(song_count<10).count())
     # song cold-start
+    f2 = plt.figure()
     user_count = data.groupby('song_id').count()['msno'] # user count per song
     print('\nUser count per song: mean {:.2f}, max {}, min {}'.format(user_count.mean(), user_count.max(), user_count.min()))
-    user_count.hist(bins=100, range=[0,150])
+    user_count.hist(bins=40, range=[0,200])
     plt.xlabel('user count per song')
     plt.ylabel('number of songs')
     plt.savefig('./plots/song_coldstart.png')
-    print('Number of songs with < 5 users listened to it: ', user_count.where(user_count<5).count())   
+    print('Number of songs with <= 3 users listened to it: ', user_count.where(user_count<=3).count())   
 
 if __name__ == '__main__':
-    main(dataset_path='./datasets/', dev=True)
+    # main(dataset_path='./datasets/', dev=True)
+    main(dataset_path='./datasets/', dev=False)
